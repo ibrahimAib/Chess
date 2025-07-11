@@ -1,0 +1,41 @@
+body{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+.container{
+    width: 80vh;
+    aspect-ratio: 1 / 1;
+
+    position:fixed;
+    right: auto;
+    left: auto;
+    background-color: rgb(131, 64, 9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.board{
+    width: 90%;
+    aspect-ratio: 1 / 1;
+    background-color: black;
+    display: grid;
+    grid: 8;
+    grid-template-columns:  12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+}
+
+.square{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    aspect-ratio: 1 / 1;
+    background-color: rgb(163, 116, 46);
+    border:  1px solid white;
+}
+
+.filled{
+    cursor: pointer;
+}
