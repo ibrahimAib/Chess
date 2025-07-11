@@ -22,7 +22,7 @@ let chess = [
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
-  { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
+  { 1: "", 2: "b-pawn", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   {
     1: "w-pawn",
     2: "w-pawn",
@@ -107,7 +107,24 @@ function move_pieces(
 }
 function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
   if (col_start != col) {
-    return;
+    if (
+      col == col_start + 1 ||
+      (col == col_start - 1) & (row_start - 1 == row)
+    ) {
+      console.log(true);
+    }
+    if (square == '' || square[0] == turn) {
+      return;
+    }
+  }
+  // اذا تلاقت قطعتين
+  if (square != "") {
+    if (square[0] == turn) {
+      return;
+    }
+    if (col == col_start) {
+      return;
+    }
   }
   // row_start - row == عدد المربعات اللي لعبها اللاعب
   if (row_start - row > 1) {
@@ -119,10 +136,6 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
       return;
     }
   }
-  // اذا تلاقت قطعتين ما تقدر تمشي
-  if (square != "" ) {
-    return;
-  }
-  if()
+
   move_pieces(row_start, col_start, clicked_piece, square, col, row);
 }
