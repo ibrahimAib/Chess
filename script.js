@@ -106,15 +106,15 @@ function move_pieces(
   }
 }
 function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
-  if (col_start != col) {
-    if (
-      col == col_start + 1 ||
-      (col == col_start - 1) & (row_start - 1 == row)
-    ) {
-      console.log(true);
-    }
-    if (square == '' || square[0] == turn) {
-      return;
+  let isInRightCol = col_start != col;
+  let isInRightPotentialTake =
+    col == col_start + 1 || (col == col_start - 1) & (row_start - 1 == row);
+  let isMyPiece = square == "" || square[0] == turn;
+  if (isInRightCol) {
+    if (isInRightPotentialTake) {
+      if (isMyPiece) {
+        return;
+      }
     }
   }
   // اذا تلاقت قطعتين
