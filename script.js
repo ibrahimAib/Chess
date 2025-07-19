@@ -53,18 +53,34 @@ let chess = [
     8: "w-rook",
   },
 ];
+let turn = "w";
+let isMovingBack = (a, b) => a < b;
+if (turn == "w") {
+  isMovingBack = (a, b) => a > b;
+} else {
+  isMovingBack = (a, b) => a < b;
+}
+function rotate() {
+  window.onload = function () {
+    document.getElementById("board").classList.add("flipped");
+    let squares = document.getElementsByClassName("square");
+    for (let i = 0; i < squares.length; i++) {
+      squares[i].classList.add("image-flipped");
+    }
+  };
+}
+// rotate();
 let clicked_piece = null;
 let row_start = 0;
 let col_start = 0;
-let turn = "w";
 render();
 function render() {
   document.getElementById("board").innerHTML = "";
 
   for (let row = 0; row < chess.length; row++) {
-    let color = row
+    let color = row;
     for (let col = 1; col < 9; col++) {
-      color++
+      color++;
       row_start_local = row;
       col_start_local = col;
 
@@ -73,10 +89,10 @@ function render() {
 
       board.innerHTML += `<div id="${col_start_local},${row_start_local}" onClick="handelClick('${square}',${col_start_local},${row_start_local})" 
         class="square ${square == "" ? "" : "filled"}
-        ${color % 2 === 0? 'dark' : 'light'}
+        ${color % 2 === 0 ? "dark" : "light"}
         ">
         
-        ${square == "" ? "" : `<img src="/imges/${square}.png" alt="">`}
+        ${square == "" ? "" : `<img  src="/imges/${square}.png" alt="">`}
       </div>`;
     }
   }
@@ -100,8 +116,25 @@ function handelClick(square, col, row) {
     case "w-pawn":
       handel_Wpawn(row_start, col_start, clicked_piece, square, col, row);
       break;
+
+    case "b-pawn":
+      handel_Wpawn(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
     case "w-rook":
       handel_rook(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
+    case "b-rook":
+      handel_rook(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
+    case "w-knight":
+      handel_knight(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
+    case "b-knight":
+      handel_knight(row_start, col_start, clicked_piece, square, col, row);
       break;
 
     default:
@@ -110,55 +143,41 @@ function handelClick(square, col, row) {
 
   // render();
 }
-function move_pieces(
-  row_start,
-  col_start,
-  clicked_piece_local,
-  square,
-  col,
-  row
-) {
-  if (square == "" || square[0] != clicked_piece_local[0]) {
-    chess[row][col] = clicked_piece_local;
-    chess[row_start][col_start] = "";
-    clicked_piece = null;
-    document.getElementById(
-      `${col},${row}`
-    ).innerHTML = `<img src="/imges/${clicked_piece_local}.png" alt="">`;
-    document.getElementById(`${col},${row}`).classList.add("filled");
-    document
-      .getElementById(`${col},${row}`)
-      .setAttribute(
-        "onclick",
-        `handelClick("${clicked_piece_local}", ${col}, ${row})`
-      );
-    document.getElementById(`${col_start},${row_start}`).innerHTML = "";
 
-    document
-      .getElementById(`${col_start},${row_start}`)
-      .classList.remove("filled");
-    document
-      .getElementById(`${col_start},${row_start}`)
-      .setAttribute(
-        "onclick",
-        `handelClick("", ${col_start}, ${row_start})`
-      );
-  }
-}
-function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
-  let isInRightCol = col_start != col;
-  let isInRightPotentialTake =
-    col == col_start + 1 || (col == col_start - 1) & (row_start - 1 == row);
+function handel_knight(row_start, col_start, clicked_piece, square, col, row) {
+  let isInRightSquare =
+    (col == col_start + 2 && row == row_start + 1) ||
+    (col == col_start - 2 && row == row_start + 1) ||
+    (col == col_start + 2 && row == row_start - 1) ||
+    (col == col_start - 2 && row == row_start - 1) ||
+    (col == col_start + 1 && row == row_start + 2) ||
+    (col == col_start - 1 && row == row_start + 2) ||
+    (col == col_start + 1 && row == row_start - 2) ||
+    (col == col_start - 1 && row == row_start - 2);
   let isMyPiece = square == "" || square[0] == turn;
-  if (isInRightCol) {
-    if (isInRightPotentialTake) {
-      if (isMyPiece) {
-        return;
-      }
-    } else {
+  if (!isInRightSquare) {
+    if (isMyPiece) {
       return;
     }
   }
+  // اذا تلاقت قطعتين
+  if (square != "") {
+    if (square[0] == turn) {
+      return;
+    }
+    if (!isInRightSquare) {
+      return;
+    }
+  }
+
+  move_pieces(row_start, col_start, clicked_piece, square, col, row);
+}
+
+function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
+  let isInRightCol = col_start != col;
+  let isInRightPotentialTake;
+  let isMyPiece = square == "" || square[0] == turn;
+
   // اذا تلاقت قطعتين
   if (square != "") {
     if (square[0] == turn) {
@@ -170,13 +189,48 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
   }
 
   // ايقاف الجندي من الرجوع
-  if (row > row_start) {
+  if (isMovingBack(row, row_start)) {
     return;
   }
-  // row_start - row == عدد المربعات اللي لعبها اللاعب
-  if (row_start - row > 1) {
-    if (row_start == 6) {
-      if (row_start - row > 2) {
+
+  if (chess[row_start][col_start][0] == "w") {
+    isInRightPotentialTake =
+      col == col_start + 1 || (col == col_start - 1) & (row_start - 1 == row);
+    // row_start - row == عدد المربعات اللي لعبها اللاعب
+    if (row_start - row > 1) {
+      if (row_start == 6) {
+        if (row_start - row > 2) {
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+  } else {
+    // console.log(`row_start ${row_start}`)
+    // console.log(`row ${row}`)
+    // console.log(col == col_start - 1);
+    // console.log(row);
+    // row_start - row == عدد المربعات اللي لعبها اللاعب
+    isInRightPotentialTake =
+      (col == col_start - 1) & (row == row_start + 1) ||
+      (col == col_start + 1) & (row == row_start + 1);
+    console.log(`isInRightPotentialTake : ${isInRightPotentialTake}`);
+
+    if (row - row_start > 1) {
+      if (row_start == 1) {
+        if (row - row_start > 2) {
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+  }
+
+  if (isInRightCol) {
+    if (isInRightPotentialTake) {
+      if (isMyPiece) {
         return;
       }
     } else {
@@ -186,9 +240,8 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
 
   move_pieces(row_start, col_start, clicked_piece, square, col, row);
 }
+
 function handel_rook(row_start, col_start, clicked_piece, square, col, row) {
-  console.log(`col: ${col}, ${col_start}`);
-  console.log(`row: ${row}, ${row_start}`);
   let isInRightCol = col_start == col || row_start == row;
 
   let isMyPiece = square == "" || square[0] == turn;
@@ -233,4 +286,44 @@ function handel_rook(row_start, col_start, clicked_piece, square, col, row) {
   }
 
   move_pieces(row_start, col_start, clicked_piece, square, col, row);
+}
+
+function move_pieces(
+  row_start,
+  col_start,
+  clicked_piece_local,
+  square,
+  col,
+  row
+) {
+  if (square == "" || square[0] != clicked_piece_local[0]) {
+    chess[row][col] = clicked_piece_local;
+    chess[row_start][col_start] = "";
+    clicked_piece = null;
+    document.getElementById(
+      `${col},${row}`
+    ).innerHTML = `<img src="/imges/${clicked_piece_local}.png" alt="">`;
+    document.getElementById(`${col},${row}`).classList.add("filled");
+    document
+      .getElementById(`${col},${row}`)
+      .setAttribute(
+        "onclick",
+        `handelClick("${clicked_piece_local}", ${col}, ${row})`
+      );
+    document.getElementById(`${col_start},${row_start}`).innerHTML = "";
+
+    document
+      .getElementById(`${col_start},${row_start}`)
+      .classList.remove("filled");
+    document
+      .getElementById(`${col_start},${row_start}`)
+      .setAttribute("onclick", `handelClick("", ${col_start}, ${row_start})`);
+  }
+  if (turn == "w") {
+    isMovingBack = (a, b) => a < b;
+    turn = "b";
+  } else {
+    isMovingBack = (a, b) => a > b;
+    turn = "w";
+  }
 }

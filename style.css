@@ -44,3 +44,10 @@ body{
 .filled{
     cursor: pointer;
 }
+
+.flipped {
+  transform: rotate(180deg);
+}
+.image-flipped {
+  transform: rotate(180deg);
+}
