@@ -21,8 +21,17 @@ let chess = [
   },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
+  {
+    1: "",
+    2: "",
+    3: "",
+    4: "",
+    5: "",
+    6: "",
+    7: "",
+    8: "",
+  },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
-  { 1: "", 2: "b-pawn", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   {
     1: "w-pawn",
     2: "w-pawn",
@@ -53,22 +62,29 @@ function render() {
   document.getElementById("board").innerHTML = "";
 
   for (let row = 0; row < chess.length; row++) {
+    let color = row
     for (let col = 1; col < 9; col++) {
+      color++
       row_start_local = row;
       col_start_local = col;
 
       var square = chess[row][col] == null ? "" : chess[row][col];
       var board = document.getElementById("board");
 
-      board.innerHTML += `<div onClick="handelClick('${square}',${col_start_local},${row_start_local})" class="square ${
-        square == "" ? "" : "filled"
-      }">${
-        square == "" ? "" : `<img src="/imges/${square}.png" alt="">`
-      }</div>`;
+      board.innerHTML += `<div id="${col_start_local},${row_start_local}" onClick="handelClick('${square}',${col_start_local},${row_start_local})" 
+        class="square ${square == "" ? "" : "filled"}
+        ${color % 2 === 0? 'dark' : 'light'}
+        ">
+        
+        ${square == "" ? "" : `<img src="/imges/${square}.png" alt="">`}
+      </div>`;
     }
   }
 }
 
+{
+  /* <div id="3,7" onclick="handelClick('w-Bishop',3,7)" class="square filled"></div> */
+}
 function handelClick(square, col, row) {
   if (square != "") {
     if (square[0] == turn) {
@@ -84,12 +100,15 @@ function handelClick(square, col, row) {
     case "w-pawn":
       handel_Wpawn(row_start, col_start, clicked_piece, square, col, row);
       break;
+    case "w-rook":
+      handel_rook(row_start, col_start, clicked_piece, square, col, row);
+      break;
 
     default:
       break;
   }
 
-  render();
+  // render();
 }
 function move_pieces(
   row_start,
@@ -103,6 +122,27 @@ function move_pieces(
     chess[row][col] = clicked_piece_local;
     chess[row_start][col_start] = "";
     clicked_piece = null;
+    document.getElementById(
+      `${col},${row}`
+    ).innerHTML = `<img src="/imges/${clicked_piece_local}.png" alt="">`;
+    document.getElementById(`${col},${row}`).classList.add("filled");
+    document
+      .getElementById(`${col},${row}`)
+      .setAttribute(
+        "onclick",
+        `handelClick("${clicked_piece_local}", ${col}, ${row})`
+      );
+    document.getElementById(`${col_start},${row_start}`).innerHTML = "";
+
+    document
+      .getElementById(`${col_start},${row_start}`)
+      .classList.remove("filled");
+    document
+      .getElementById(`${col_start},${row_start}`)
+      .setAttribute(
+        "onclick",
+        `handelClick("", ${col_start}, ${row_start})`
+      );
   }
 }
 function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
@@ -115,6 +155,8 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
       if (isMyPiece) {
         return;
       }
+    } else {
+      return;
     }
   }
   // اذا تلاقت قطعتين
@@ -126,6 +168,11 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
       return;
     }
   }
+
+  // ايقاف الجندي من الرجوع
+  if (row > row_start) {
+    return;
+  }
   // row_start - row == عدد المربعات اللي لعبها اللاعب
   if (row_start - row > 1) {
     if (row_start == 6) {
@@ -133,6 +180,54 @@ function handel_Wpawn(row_start, col_start, clicked_piece, square, col, row) {
         return;
       }
     } else {
+      return;
+    }
+  }
+
+  move_pieces(row_start, col_start, clicked_piece, square, col, row);
+}
+function handel_rook(row_start, col_start, clicked_piece, square, col, row) {
+  console.log(`col: ${col}, ${col_start}`);
+  console.log(`row: ${row}, ${row_start}`);
+  let isInRightCol = col_start == col || row_start == row;
+
+  let isMyPiece = square == "" || square[0] == turn;
+  if (!isInRightCol) {
+    return;
+  }
+
+  if (row < row_start) {
+    for (i = row_start - 1; i > row; i--) {
+      if (chess[i][col] != "") {
+        return;
+      }
+    }
+  }
+  if (row > row_start) {
+    for (i = row_start + 1; i < row; i++) {
+      if (chess[i][col] != "") {
+        return;
+      }
+    }
+  }
+
+  if (col > col_start) {
+    for (i = col_start + 1; i < col; i++) {
+      if (chess[row][i] != "") {
+        return;
+      }
+    }
+  }
+  if (col < col_start) {
+    for (i = col_start - 1; i > col; i--) {
+      if (chess[row][i] != "") {
+        return;
+      }
+    }
+  }
+
+  if (square != "") {
+    if (isMyPiece) {
       return;
     }
   }

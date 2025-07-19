@@ -11,7 +11,7 @@ body{
     position:fixed;
     right: auto;
     left: auto;
-    background-color: rgb(131, 64, 9);
+    background-color: #7c5b3f;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,10 +32,15 @@ body{
     align-items: center;
     color: white;
     aspect-ratio: 1 / 1;
-    background-color: rgb(163, 116, 46);
     border:  1px solid white;
 }
+.light{
+    background-color: #f0d9b5;
+}
+.dark{
+    background-color: #b58863;
 
+}
 .filled{
     cursor: pointer;
 }
