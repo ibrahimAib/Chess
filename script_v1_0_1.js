@@ -2,7 +2,7 @@ let chess = [
   {
     1: "b-rook",
     2: "b-knight",
-    3: "b-Bishop",
+    3: "b-bishop",
     4: "b-queen",
     5: "b-king",
     6: "b-bishop",
@@ -21,16 +21,7 @@ let chess = [
   },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
-  {
-    1: "",
-    2: "",
-    3: "",
-    4: "",
-    5: "",
-    6: "",
-    7: "",
-    8: "",
-  },
+  { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   { 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "" },
   {
     1: "w-pawn",
@@ -45,7 +36,7 @@ let chess = [
   {
     1: "w-rook",
     2: "w-knight",
-    3: "w-Bishop",
+    3: "w-bishop",
     4: "w-queen",
     5: "w-king",
     6: "w-bishop",
@@ -92,15 +83,12 @@ function render() {
         ${color % 2 === 0 ? "dark" : "light"}
         ">
         
-        ${square == "" ? "" : `<img  src="/imges/${square}.png" alt="">`}
+        ${square == "" ? "" : `<img class="images"  src="/imges/${square}.png" alt="">`}
       </div>`;
     }
   }
 }
 
-{
-  /* <div id="3,7" onclick="handelClick('w-Bishop',3,7)" class="square filled"></div> */
-}
 function handelClick(square, col, row) {
   if (square != "") {
     if (square[0] == turn) {
@@ -135,6 +123,14 @@ function handelClick(square, col, row) {
 
     case "b-knight":
       handel_knight(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
+    case "w-bishop":
+      handel_bishop(row_start, col_start, clicked_piece, square, col, row);
+      break;
+
+    case "b-bishop":
+      handel_bishop(row_start, col_start, clicked_piece, square, col, row);
       break;
 
     default:
@@ -279,6 +275,53 @@ function handel_rook(row_start, col_start, clicked_piece, square, col, row) {
     }
   }
 
+  if (square != "") {
+    if (isMyPiece) {
+      return;
+    }
+  }
+
+  move_pieces(row_start, col_start, clicked_piece, square, col, row);
+}
+
+function handel_bishop(row_start, col_start, clicked_piece, square, col, row) {
+  let isInRightCol = col_start != col & row_start != row;
+
+  let isMyPiece = square == "" || square[0] == turn;
+  if (!isInRightCol) {
+    return;
+  }
+
+  if (row < row_start) {
+    for (i = row_start - 1; i > row; i--) {
+      if (chess[i][col] != "") {
+        return;
+      }
+    }
+  }
+  if (row > row_start) {
+    for (i = row_start + 1; i < row; i++) {
+      if (chess[i][col] != "") {
+        return;
+      }
+    }
+  }
+
+  if (col > col_start) {
+    for (i = col_start + 1; i < col; i++) {
+      if (chess[row][i] != "") {
+        return;
+      }
+    }
+  }
+  if (col < col_start) {
+    for (i = col_start - 1; i > col; i--) {
+      if (chess[row][i] != "") {
+        return;
+      }
+    }
+  }
+  
   if (square != "") {
     if (isMyPiece) {
       return;
